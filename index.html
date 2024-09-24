@@ -3,24 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IP Information</title>
+    <title>เช็คข้อมูล IP Address</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             text-align: center;
-            background-color: #f0f0f0;
-            padding: 50px;
+            padding: 20px;
         }
-        h1 {
-            color: #333;
-        }
-        p {
-            font-size: 18px;
-            color: #555;
+        .ip-info {
+            margin-top: 20px;
+            text-align: left;
+            display: inline-block;
         }
     </style>
 </head>
 <body>
-    <?php include 'check_ip.php'; ?>
+    <h1>เช็คข้อมูล IP Address</h1>
+
+    <div>
+        <label for="ip">กรอก IP Address:</label>
+        <input type="text" id="ip" placeholder="เช่น 8.8.8.8">
+        <button onclick="getIPInfo()">เช็ค IP</button>
+    </div>
+
+    <div class="ip-info" id="ip-info"></div>
+
+    <script>
+        function getIPInfo() {
+            const ipAddress = document.getElementById('ip').value;
+            if (!ipAddress) {
+                alert("กรุณากรอก IP Address");
+                return;
+            }
+
+            fetch(`https://ipinfo.io/${ipAddress}/json?token=70330ae9396417`) // ใช้ Token ที่ถูกต้อง
+                .then(response => response.json())
+                .then(data => {
+                    const ipInfoDiv = document.getElementById('ip-info');
+                    ipInfoDiv.innerHTML = `
+                        <p><strong>ที่อยู่ IP:</strong> ${data.ip}</p>
+                        <p><strong>ชื่อโฮสต์:</strong> ${data.hostname ? data.hostname : 'ไม่ทราบ'}</p>
+                        <p><strong>ตำแหน่งที่ตั้ง:</strong> ${data.city}, ${data.region}, ${data.country}</p>
+                        <p><strong>ละติจูด/ลองจิจูด:</strong> ${data.loc}</p>
+                        <p><strong>ผู้ให้บริการเครือข่าย (ISP):</strong> ${data.org}</p>
+                        <p><strong>เขตเวลา:</strong> ${data.timezone}</p>
+                        <p><strong>รหัสไปรษณีย์:</strong> ${data.postal}</p>
+                    `;
+                })
+                .catch(error => {
+                    console.error('เกิดข้อผิดพลาด:', error);
+                    alert('ไม่สามารถดึงข้อมูลได้ กรุณาตรวจสอบ IP Address');
+                });
+        }
+    </script>
 </body>
 </html>
